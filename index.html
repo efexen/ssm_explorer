@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <title>SSM Explorer</title>
+    <style>
+      .params_container div {
+        margin-left: 15px;
+        padding: 5px 0;
+      }
+
+      div.node {
+        font-weight: bold;
+      }
+
+      div.key {
+        font-weight: normal;
+      }
+
+      div.node:before {
+        content: "-";
+        margin-right: 5px;
+      }
+
+      div.node.collapsed:before {
+        content: "+";
+      }
+
+      div.collapsed div {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="params_container">
+    </div>
+    <script>
+      window.data = {{.Params}};
+    </script>
+    <script>
+      window.data.Parameters.forEach(function(param) {
+        var segments = param.Name.split("/");
+        var node = document.querySelector(".params_container");
+
+        segments.forEach(function(path) {
+          if (node.querySelector("[path='" + path + "']") == null) {
+            var name = path;
+            if (name == "") { name = "[root]" }
+
+            var new_elem = document.createElement("div");
+            new_elem.appendChild(document.createTextNode(name));
+            new_elem.setAttribute("path", path);
+            new_elem.classList.add("node", "collapsed");
+
+            new_elem.addEventListener('click', function(event) {
+              if (this.classList.contains("collapsed")) {
+                this.classList.remove("collapsed");
+              } else {
+                this.classList.add("collapsed");
+              }
+              event.stopPropagation();
+            });
+
+            node.appendChild(new_elem);
+            node = new_elem;
+          } else {
+            node = node.querySelector("[path='" + path + "']");
+          }
+        });
+
+        node.classList.remove("collapsed");
+        node.classList.remove("node");
+        node.classList.add("key");
+      });
+    </script>
+  </body>
+</html>
